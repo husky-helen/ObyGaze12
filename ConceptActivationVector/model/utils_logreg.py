@@ -1,0 +1,144 @@
+import pandas as pd
+import os
+import torch
+from collections import defaultdict
+import numpy as np
+from sklearn.svm import SVC
+from tqdm import tqdm
+from torch.utils.data import Dataset, DataLoader
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from matplotlib import pyplot as plt
+import pickle
+
+from model.utils_classiflevel import load_annotation, load_elected_svms, project_XCLIP_on_CAV
+from sklearn.linear_model import LogisticRegression
+
+
+def train_final_logreg(projected_df_, classif_exps, hyperparameter_dico):
+    """Train a logistic regression based on the hyperparameters found thanks to a cross-validation previously done. 
+    The final logistic regression is trained on the training and validation set since the hyperparameters are already tuned.
+
+    Args:
+        projected_df_ (pandas.DataFrame): contains objectification annotations and the projected values of the embedding on each CAV
+        classif_exps (Dict): Experiments on which the logistic regression should be trained (ex: {"EN_vs_S":["Easy Neg":0, "Sure":1]})
+        hyperparameter_dico (Dict): Logistic regression hyperparameters 
+
+    Returns:
+        pandas.DataFrame: results dataframe (metrics)
+        Dict: {classif_exp: {exp_type: tree}}
+    """
+    final_reglog_res = {}
+
+    final_liste_res = []
+
+
+    max_fold = projected_df_.fold.max()
+
+    for classif_exp, dico_level in classif_exps.items():
+        print("Classification : ", classif_exp)
+        final_reglog_res[classif_exp] = {}
+
+        for exp_type in ["Sc_HNc_vs_conceptbar"]:
+            print("\tExp type : ", exp_type)
+
+
+            projected_df_["new_label"] = projected_df_["label"].map(dico_level)
+            projected_df_exp_type = projected_df_.query("exp_type==@exp_type")
+            exp_df = projected_df_exp_type.dropna(subset="new_label")
+
+            df_train = exp_df.query("fold != @max_fold")
+            X_train= df_train.iloc[:, 2:10]
+            nans = X_train[X_train.isna().any(axis=1)].index
+
+            y_train = df_train.loc[:,"new_label"]
+
+            df_test = exp_df.query("fold == @max_fold")
+            X_test= df_test.iloc[:, 2:10]
+            y_test = df_test.loc[:,"new_label"]
+
+
+            penalty,C = hyperparameter_dico[classif_exp][exp_type]
+
+            my_logreg = LogisticRegression(random_state=42, solver="liblinear", penalty=penalty, C = C)
+            
+            my_logreg.fit(X_train, y_train)
+            y_test_pred = my_logreg.predict(X_test)
+            accuracy_test = accuracy_score(y_test, y_test_pred)
+            f1_test = f1_score(y_test, y_test_pred)
+
+            final_reglog_res[classif_exp][exp_type] = my_logreg
+
+            elem_list = [classif_exp, exp_type, penalty, C,accuracy_test,f1_test]
+            final_liste_res.append(elem_list)
+    
+    return final_reglog_res
+
+def infer_different_task(projected_df_, final_reglog_res, classif_exps, hyperparameter_dico):
+    """Test the logisitc regression on tasks for which it has not necessarily been trained
+
+    Args:
+        final_arbre_res (Dict): {classif_exp:{"Sc_HNc_vs_conceptbar":decision_tree}}
+        projected_df_ (pandas.DataFrame): _description_
+        classif_exps (Dict): Experiments on which the logistic regression should be trained (ex: {"EN_vs_S":["Easy Neg":0, "Sure":1]})
+        hyperparameter_dico (Dict): Logistic regression hyperparameters 
+
+    Returns:
+        pandas.DataFrame: contains metrics obtained on each task
+    """
+    lines_inferences = []
+    max_fold = projected_df_.fold.max()
+    for training_exptype, dico1 in final_reglog_res.items():
+
+        for svm_exptype, my_logreg in dico1.items():
+
+            for predicting_exptype in ["EN_S", "ENHN_S"]:
+                dico_level = classif_exps[predicting_exptype]
+                projected_df_["new_label"] = projected_df_["label"].map(dico_level)
+                projected_df_exp_type = projected_df_.query("exp_type==@svm_exptype")
+                exp_df = projected_df_exp_type.dropna(subset="new_label")
+
+                df_train = exp_df.query("fold != @max_fold")
+                X_train= df_train.iloc[:, 2:10]
+                nans = X_train[X_train.isna().any(axis=1)].index
+
+                y_train = df_train.loc[:,"new_label"]
+
+                df_test = exp_df.query("fold == @max_fold")
+                X_test= df_test.iloc[:, 2:10]
+                y_test = df_test.loc[:,"new_label"]
+
+
+                max_depth, min_samples_leaf = hyperparameter_dico[training_exptype][svm_exptype]
+            
+                y_test_pred = my_logreg.predict(X_test)
+                accuracy_test = accuracy_score(y_test, y_test_pred)
+                f1_test = f1_score(y_test, y_test_pred)
+
+            
+
+                elem_list = [training_exptype, svm_exptype, predicting_exptype,  max_depth, min_samples_leaf,accuracy_test,f1_test]
+                lines_inferences.append(elem_list)
+    res_inference = pd.DataFrame(lines_inferences, columns = ["training_exptype","svm_exp","predicting", "penalty","C", "acc_test","f1_test"])
+    return res_inference
+
+
+def logreg_process(path_annotation,path_svm_elected, path_embedding, classif_exps, hyperparameter_dico):
+    """Whole process
+
+    Args:
+        path_annotation (str or pathlike): Path to the csv file containing objectification annotation
+        path_svm_elected (str or pathlike): Path to the dir storing svms elected from the cross-validation 
+        path_embedding (str or pathlike): Path to the dir storing XCLIP embeddings
+        classif_exps (Dict): Experiments on which the logistic regression should be trained (ex: {"EN_vs_S":["Easy Neg":0, "Sure":1]})
+        hyperparameter_dico (Dict): Logistic regression hyperparameters 
+
+
+    Returns:
+        pandas.DataFrame: Final results
+    """
+    df_annotation = load_annotation(path_annotation)
+    dico_svms = load_elected_svms(path_svm_elected)
+    projected_df_ = project_XCLIP_on_CAV(df_annotation, path_embedding, dico_svms)
+    final_reglog_res = train_final_logreg(projected_df_, classif_exps, hyperparameter_dico)
+    res_inference = infer_different_task(projected_df_, final_reglog_res, classif_exps, hyperparameter_dico)
+    return res_inference

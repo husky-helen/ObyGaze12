@@ -1,0 +1,10 @@
+{
+    "Body": 0.05,
+    "Type of plan": 0.01,
+    "Clothes": 0.01,
+    "Posture": 0.01,
+    "Look": 0.05,
+    "Activities": 0.05,
+    "Exp of  emotion": 0.01,
+    "Appearance": 0.01
+}
