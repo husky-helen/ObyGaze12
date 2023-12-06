@@ -4,7 +4,7 @@ We are unable to provide you with the original clips and films, so we advise you
 
 ## 2. Feature Extraction
 
-We extracted features by using 2 models. Path to the clips, embeddingd are stored in FeatureExtraction/arg_pars.py. Please replace our path with yours or call the main files by passing your own paths.
+We extracted features by using 2 models. Some parameters are set in FeatureExtraction/arg_pars.py. Please replace ours with yours or call the main files by passing your own parameters. In the **FeatureExtraction folder** there is an **environment.yml** file which can be used to create a conda environment with the libraries needed to run python files.
 
 ### 2.1. XCLIP
 ```
@@ -19,7 +19,7 @@ python main_extraction.py --model_type "ViVit"
 
 ## 3. Concept Activation Vector
 
-Path to the clips, embeddingd are stored in FeatureExtraction/arg_pars.py. Please replace our path with yours or call the main files by passing your own paths.
+Some parameters are set in FeatureExtraction/arg_pars.py. Please replace ours path with yours or call the main files by passing your own parameters.
 
 To **train** the svms : 
 ```
@@ -43,7 +43,7 @@ python main_logreg.py
 
 ## 4. Classification of the level of objectification using embedding extracted with XCLIP and ViVit
 
-Default parameters can be changed directly in the **arg_parse.py** file in the **LinearProbing** folder or can be given when calling functions. If you want details of the metrics you can launch tensorboard in the folder containing the logs of the experiment of interest.
+Default parameters can be changed directly in the **arg_parse.py** file in the **LinearProbing** folder or can be given when calling functions. Detailed metrics can be studied by launching tensorboard in the folder containing the logs of the experiment of interest. In the **LinearProbing folder** there is an **environment.yml** file which can be used to create a conda environment with the libraries needed to run python files.
 
 To **train and infer** the model on the level objectification task
 ```
