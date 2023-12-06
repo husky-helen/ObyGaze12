@@ -43,7 +43,7 @@ python main_logreg.py
 
 ## 4. Classification of the level of objectification using embedding extracted with XCLIP and ViVit
 
-Default parameters can be changed directly in the **arg_parse.py** file in the **LinearProbing** folder or can be given when calling functions.
+Default parameters can be changed directly in the **arg_parse.py** file in the **LinearProbing** folder or can be given when calling functions. If you want details of the metrics you can launch tensorboard in the folder containing the logs of the experiment of interest.
 
 To train and infer the model on the level objectification task
 ```
