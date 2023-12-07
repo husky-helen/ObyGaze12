@@ -1,3 +1,17 @@
+## 0. Repository architecture
+
+This is the global architecture of the repository 
+
+* Feature Extraction
+* Linear Probing
+  * balanced_level
+  * dataset
+  * models
+  * models_movieset   
+* Concept Activation Vector
+  * dataset
+  * model   
+
 ## 1. Movie Downloading
 
 We are unable to provide you with the original clips and films, so we advise you to request access to the MovieGraphs dataset, which provides purchase links for the films as well as the breakdown of the films into clips.
