@@ -59,22 +59,22 @@ python main_logreg.py
 
 Default parameters can be changed directly in the **arg_parse.py** file in the **LinearProbing** folder or can be given when calling functions. Detailed metrics can be studied by launching tensorboard in the folder containing the logs of the experiment of interest. In the **LinearProbing folder** there is an **environment.yml** file which can be used to create a conda environment with the libraries needed to run python files.
 
-To **train and infer** the model on the level objectification task
+To **train and infer** the model on the objectification detection task
 ```
 python main_train_and_infer_linearprobing.py
 ```
 
-To **train** the model on the level objectification task
+To **train** the model on the objectification detection task
 ```
 python main_train_linearprobing.py
 ```
 
-To **infer** with the model on the level objectification task
+To **infer** with the model on the objectification detection task
 ```
 python main_infer_linearprobing.py
 ```
 
-To **train and infer** the model on the level objectification task with a dataset for which film clips are part of the same set 
+To **train and infer** the model on the objectification detection task with a dataset where clips in the training, validation and testing set cannot originate from the same movie.
 
 ```
 python main_movieset.py
