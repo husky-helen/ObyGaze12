@@ -15,12 +15,17 @@ In the **FeatureExtraction folder** there is :
 To run the following 2 commands, you need to be in the FeatureExtraction folder.
 Some parameters are set in FeatureExtraction/arg_pars.py. Please replace ours with yours or call the main files by passing your own parameters. 
 
-### 2.1. X-CLIP
+### 2.1. Feature extraction with X-CLIP
+
+To extract features with the X-CLIP model, execute this command in the FeatureExtraction folder.
+
 ```
 python main_extraction.py --model_type "XCLIP"
 ```
 
-### 2.2 ViVit
+### 2.2 Feature extraction with ViVit
+
+To extract features with the ViVit model, execute this command in the FeatureExtraction folder.
 
 ```
 python main_extraction.py --model_type "ViVit"
