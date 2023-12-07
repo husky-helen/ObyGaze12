@@ -10,7 +10,7 @@ from pytorch_lightning.loggers import TensorBoardLogger
 from models.lightning_model import DynMLP2HiddenLit
 from dataset.balanced_dataset import LinearProbing_KFold
 
-def infer_one_model_one_infertype(model_path, features_dir, gt_csv, dico_level, logger_dir= "/home/julie/Results/LinearProbing/Inference", logger_name = "test", logger_version = "version"):
+def infer_one_model_one_infertype(model_path, features_dir, gt_csv, dico_level, logger_dir= "/home/xxx/Results/LinearProbing/Inference", logger_name = "test", logger_version = "version"):
     """Does the inference for one experiment
 
     Args:
@@ -18,7 +18,7 @@ def infer_one_model_one_infertype(model_path, features_dir, gt_csv, dico_level, 
         features_dir (str or pathlike): path to the directory containing features extracted 
         gt_csv (str or pathlike): path to the objectification annotation file
         dico_level (dict): dictionnary containing the classes to use
-        logger_dir (str, optional): Path to the directory where the logs should be saved. Defaults to "/home/julie/Results/LinearProbing/Inference".
+        logger_dir (str, optional): Path to the directory where the logs should be saved. Defaults to "/home/xxx/Results/LinearProbing/Inference".
         logger_name (str, optional): name of the exeperiment. Defaults to "test".
         logger_version (str, optional): name of the version of the experiment. Defaults to "version".
 
