@@ -311,4 +311,4 @@ dependencies:
       - pytube==15.0.0
       - tokenizers==0.14.1
       - transformers==4.35.0.dev0
-prefix: /home/julie/anaconda3/envs/FeaturExtraction
+prefix: /home/xxx/anaconda3/envs/FeaturExtraction
