@@ -35,5 +35,5 @@ def load_video(video_name,max_frame = 32, target_size = (224,224) ):
     video_length = len(videoreader)
     indices_ = calculate_frame_indices(video_length, max_frame)
     video_frames = videoreader.get_batch(indices_).asnumpy()
-    resized_frames = np.array([cv2.resize(frame, target_size) for frame in video_frames]) # new julie
+    resized_frames = np.array([cv2.resize(frame, target_size) for frame in video_frames])
     return resized_frames #Old : video_frames
